@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLOW — Built for Hospitality. Powered by AI.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#14D8F7; --cyan-deep:#00d2ff; --cyan-pale:#A4F4FD; --navy:#0B2551; --navy-deep:#091020;
+  --black:#0A0A0C; --surface:#141619; --line:rgba(255,255,255,.08);
+  --white:#fff; --g200:#E4E6EA; --g400:#9CA0A8; --g600:#5A5E66;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--black);color:var(--white);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5}
+::selection{background:rgba(20,216,247,.3)}
+a{text-decoration:none;color:inherit}
+img,video{display:block}
+
+/* ---- fixed bg video ---- */
+.bg-video{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-video video{width:100%;height:100%;object-fit:cover;opacity:.5;mix-blend-mode:screen}
+.bg-tint{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 100% 70% at 50% 0%,rgba(20,216,247,.10),transparent 55%),
+  radial-gradient(ellipse 90% 60% at 50% 110%,rgba(11,37,81,.4),transparent 60%);}
+.bg-grid{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.35;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 70% 50% at 50% 30%,#000 20%,transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 50% at 50% 30%,#000 20%,transparent 70%)}
+/* vertical guide lines */
+.guide{position:fixed;inset-block:0;width:1px;background:rgba(255,255,255,.07);z-index:2;pointer-events:none}
+@media(max-width:1180px){.guide{display:none}}
+
+.shell{position:relative;z-index:10}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* ---- liquid glass ---- */
+.glass{background:rgba(255,255,255,.012);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.1);position:relative;overflow:hidden;border-radius:20px}
+.glass::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.4) 0%,rgba(255,255,255,.12) 22%,rgba(255,255,255,0) 42%,rgba(255,255,255,0) 60%,rgba(255,255,255,.12) 80%,rgba(255,255,255,.4) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;
+  mask-composite:exclude;pointer-events:none}
+
+/* ---- shiny gradient text ---- */
+.shiny{background-image:linear-gradient(to right,#091020 0%,#0B2551 12.5%,#A4F4FD 32.5%,#14D8F7 50%,#0B2551 67.5%,#091020 87.5%,#091020 100%);
+  background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-fill-color:transparent;animation:shiny 6s linear infinite}
+@keyframes shiny{0%{background-position:-200% center}100%{background-position:200% center}}
+
+/* ---- nav ---- */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:18px 0;transition:all .4s cubic-bezier(.22,1,.36,1)}
+nav.scrolled{padding:11px 0;background:rgba(10,10,12,.6);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800;letter-spacing:-.04em;color:#fff}
+.nav-logo .wv{filter:drop-shadow(0 0 8px rgba(20,216,247,.7))}
+.nav-mid{display:flex;gap:32px}
+.nav-mid a{font-size:14px;font-weight:500;color:var(--g400);transition:color .25s}
+.nav-mid a:hover{color:#fff}
+.nav-mid a.navmid-join{display:none}
+@media(max-width:880px){.nav-mid a.navmid-join{display:inline-flex}}
+.pill{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:13.5px;padding:10px 20px;border-radius:100px;
+  cursor:pointer;border:none;transition:all .3s cubic-bezier(.22,1,.36,1);font-family:inherit}
+.pill-white{background:#fff;color:#000}
+.pill-white:hover{transform:scale(1.03);box-shadow:0 8px 30px -6px rgba(255,255,255,.3)}
+.pill-glass{background:rgba(255,255,255,.05);color:#fff;border:1px solid rgba(255,255,255,.14)}
+.pill-glass:hover{background:rgba(255,255,255,.1);border-color:rgba(20,216,247,.5)}
+.pill .ar{transition:transform .3s}
+.pill:hover .ar{transform:translateX(3px)}
+.hamb{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:60}
+.hamb span{width:22px;height:2px;background:#fff;border-radius:2px;transition:.3s}
+.nav-desk{display:flex;align-items:center;gap:28px}
+@media(max-width:880px){
+  .nav-mid{position:fixed;inset:0 0 auto 0;flex-direction:column;background:rgba(10,10,12,.97);backdrop-filter:blur(24px);
+    padding:90px 28px 40px;gap:22px;transform:translateY(-102%);transition:transform .45s cubic-bezier(.22,1,.36,1);z-index:55}
+  .nav-mid.open{transform:translateY(0)}
+  .nav-mid a{font-size:19px}
+  .nav-desk .pill{display:none}
+  .hamb{display:flex}
+}
+
+/* ---- eyebrow ---- */
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:500;color:var(--g400)}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 2.4s ease-in-out infinite}
+.eyebrow .tag{font-size:11px;padding:3px 10px;border-radius:100px;border:1px solid var(--line);color:var(--g400);text-transform:uppercase;letter-spacing:.08em}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 10px var(--cyan)}50%{opacity:.5;box-shadow:0 0 18px var(--cyan)}}
+
+/* ---- hero ---- */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 0 70px;position:relative}
+.hero-video{width:min(620px,90vw);aspect-ratio:16/9;margin-bottom:-40px;position:relative;z-index:2;pointer-events:none}
+.hero-video video{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen}
+.hero h1{font-size:clamp(44px,8vw,92px);font-weight:600;letter-spacing:-.04em;line-height:.92;margin-bottom:0}
+.hero-sub{margin-top:30px;color:var(--g400);max-width:540px;font-size:clamp(16px,2vw,18px);line-height:1.55}
+.hero-cta{margin-top:36px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.hero-cta .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.hero-cta .tiny{font-size:12px;color:var(--g600)}
+.scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-size:10.5px;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--g600);display:flex;flex-direction:column;align-items:center;gap:7px;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0);opacity:.6}50%{transform:translate(-50%,7px);opacity:1}}
+
+/* ---- macos strip ---- */
+.macbar{height:38px;background:rgba(0,0,0,.4);backdrop-filter:blur(12px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;z-index:10}
+.macbar-in{max-width:1080px;margin:0 auto;padding:0 28px;height:100%;display:flex;align-items:center;justify-content:space-between;font-size:12px}
+.macbar .left{display:flex;align-items:center;gap:18px;color:var(--g200)}
+.macbar .left .nm{font-weight:700}
+.macbar .left a{color:var(--g400)}
+.macbar .right{display:flex;align-items:center;gap:8px;color:var(--g400)}
+@media(max-width:680px){.macbar .mi{display:none}}
+
+/* ---- section base ---- */
+.section{padding:110px 0;position:relative;z-index:10}
+@media(max-width:768px){.section{padding:70px 0}}
+.s-head{max-width:640px;margin-bottom:50px}
+.s-head.ctr{margin-inline:auto;text-align:center}
+.s-head h2{margin-top:18px;font-size:clamp(30px,5vw,52px);font-weight:600;letter-spacing:-.035em;line-height:1.0}
+.s-head p{margin-top:18px;color:var(--g400);font-size:17px;line-height:1.6}
+
+/* ---- inbox / dashboard mockup ---- */
+.mock{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:rgba(14,16,20,.85);backdrop-filter:blur(30px);position:relative}
+.mock-bar{height:42px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--line);position:relative}
+.mock-bar .lights{display:flex;gap:8px}
+.mock-bar .lights i{width:12px;height:12px;border-radius:50%}
+.mock-bar .lbl{position:absolute;left:50%;transform:translateX(-50%);font-size:12px;color:var(--g400)}
+.mock-body{display:grid;grid-template-columns:3fr 4fr 5fr;height:520px}
+.mb-side{border-right:1px solid var(--line);background:rgba(0,0,0,.3);padding:16px;display:flex;flex-direction:column;gap:5px}
+.compose{display:flex;align-items:center;gap:7px;background:#fff;color:#000;font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:9px;margin-bottom:12px;cursor:pointer}
+.compose:hover{background:var(--cyan)}
+.nav-it{display:flex;align-items:center;gap:10px;font-size:13px;padding:8px 10px;border-radius:8px;color:var(--g400);cursor:pointer;transition:.2s}
+.nav-it:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-it.on{background:rgba(20,216,247,.1);color:#fff}
+.nav-it .ct{margin-left:auto;font-size:11px;color:var(--g600)}
+.nav-it.on .ct{color:var(--cyan)}
+.lbls{margin-top:18px}
+.lbls .t{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--g600);padding:0 10px;margin-bottom:8px}
+.lbl-it{display:flex;align-items:center;gap:10px;font-size:13px;padding:6px 10px;color:var(--g400)}
+.lbl-it i{width:8px;height:8px;border-radius:50%}
+.mb-list{border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+.list-srch{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line);color:var(--g600);font-size:13px}
+.msg{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:.2s}
+.msg:hover{background:rgba(255,255,255,.03)}
+.msg.on{background:rgba(20,216,247,.06)}
+.msg .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.msg .nm{font-size:13.5px;font-weight:600;color:#fff;display:flex;align-items:center;gap:7px}
+.msg.unread .nm::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.msg .tm{font-size:11px;color:var(--g600)}
+.msg .sub{font-size:12.5px;color:var(--g200);margin-bottom:2px}
+.msg .pv{font-size:12px;color:var(--g600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mb-read{display:flex;flex-direction:column;overflow:hidden}
+.read-tools{display:flex;align-items:center;gap:4px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.read-tools .tb{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--g400);cursor:pointer;transition:.2s}
+.read-tools .tb:hover{background:rgba(255,255,255,.06);color:#fff}
+.read-tools .sp{flex:1}
+.read-hd{padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.read-hd .ti{font-size:17px;font-weight:600;margin-bottom:12px}
+.read-hd .from{display:flex;align-items:center;gap:10px}
+.ava{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#14D8F7,#0B2551);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.read-hd .meta .a{font-size:13px;font-weight:600}
+.read-hd .meta .b{font-size:11.5px;color:var(--g600)}
+.read-hd .pillwork{margin-left:auto;font-size:11px;padding:3px 11px;border-radius:100px;background:rgba(20,216,247,.12);color:var(--cyan)}
+.read-body{padding:18px;overflow-y:auto;font-size:13.5px;color:var(--g200);line-height:1.6}
+.sumcard{display:flex;gap:10px;padding:13px;border-radius:12px;background:rgba(20,216,247,.05);border:1px solid rgba(20,216,247,.15);margin-bottom:16px}
+.sumcard .ttl{font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:.06em;margin-bottom:5px;text-transform:uppercase}
+.sumcard .tx{font-size:12.5px;color:var(--g200)}
+.read-body p{margin-bottom:12px}
+.attach{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--g200);padding:8px 13px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.02);margin-top:6px}
+@media(max-width:860px){.mock-body{grid-template-columns:1fr;height:auto}.mb-side,.mb-list{display:none}.mock-body{height:480px}}
+
+/* ---- agents bento ---- */
+.agents-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:980px){.agents-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.agents-grid{grid-template-columns:1fr}}
+.agent{padding:22px;min-height:210px;display:flex;flex-direction:column;cursor:default;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.agent:hover{transform:translateY(-6px)}
+.agent .ico{width:44px;height:44px;border-radius:12px;background:rgba(20,216,247,.08);border:1px solid rgba(20,216,247,.18);
+  display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:16px;transition:.4s}
+.agent:hover .ico{background:rgba(20,216,247,.16);box-shadow:0 0 24px -4px rgba(20,216,247,.5)}
+.agent h3{font-size:17px;font-weight:600;margin-bottom:7px}
+.agent p{font-size:13px;color:var(--g400);line-height:1.5;flex:1;margin-bottom:14px}
+.agent .badge{align-self:flex-start;font-size:11px;font-weight:600;color:var(--cyan);padding:5px 11px;border-radius:100px;background:rgba(20,216,247,.08);border:1px solid rgba(20,216,247,.18)}
+
+/* ---- triage split ---- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+@media(max-width:880px){.split{grid-template-columns:1fr;gap:36px}}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+.chip{font-size:12.5px;color:var(--g200);padding:7px 14px;border-radius:100px;border:1px solid var(--line);background:rgba(255,255,255,.025);transition:.3s}
+.chip:hover{border-color:rgba(20,216,247,.4);color:#fff}
+.triage-card{padding:20px}
+.triage-card .hd{font-size:12px;color:var(--g400);margin-bottom:14px}
+.tsub{padding:13px;border-radius:12px;margin-bottom:9px}
+.tsub-hd{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.tsub-hd i{width:9px;height:9px;border-radius:50%}
+.tsub-hd .n{font-size:13px;font-weight:600}
+.tsub-hd .c{margin-left:auto;font-size:12px;color:var(--g600)}
+.tsub .it{font-size:12px;color:var(--g400);padding:4px 0 4px 18px}
+
+/* ---- steps flow ---- */
+.flowline{display:flex;align-items:stretch;gap:0;position:relative;margin-top:10px;flex-wrap:wrap}
+.fstep{flex:1;min-width:150px;padding:22px 18px;position:relative;transition:.4s}
+.fstep .n{font-size:12px;font-weight:700;color:var(--cyan);letter-spacing:.1em;margin-bottom:9px}
+.fstep h3{font-size:16px;font-weight:600;margin-bottom:6px}
+.fstep p{font-size:12.5px;color:var(--g400);line-height:1.45}
+.fstep.hot{background:rgba(20,216,247,.05)}
+.flowtrack{height:2px;background:var(--line);position:relative;margin:24px 0 0;border-radius:2px;overflow:hidden}
+.flowtrack .fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:track 3.5s ease-in-out infinite}
+@keyframes track{0%{left:-30%;width:30%}100%{left:100%;width:30%}}
+.guarantee{margin-top:30px;padding:22px 28px;border-radius:16px;text-align:center;font-size:16.5px}
+.guarantee b{color:var(--cyan)}
+
+/* ---- personas ---- */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.pgrid{grid-template-columns:1fr}}
+.persona{padding:26px;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.persona:hover{transform:translateY(-6px)}
+.persona .em{font-size:28px;margin-bottom:14px}
+.persona h3{font-size:18px;font-weight:600;margin-bottom:4px}
+.persona .role{font-size:12px;font-weight:600;color:var(--cyan);margin-bottom:18px}
+.persona .seg{padding-top:13px;border-top:1px solid var(--line);margin-top:13px}
+.persona .lb{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.persona .bf .lb{color:#E0857F}.persona .af .lb{color:#7FE0B0}
+.persona .bf p{font-size:13.5px;color:var(--g200)}.persona .af p{font-size:13.5px;color:#A0E5C4}
+
+/* ---- pricing ---- */
+.pricing{position:relative;padding:60px 20px 100px;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+.watermark{position:relative;width:100%;max-width:1080px;text-align:center;margin-top:30px;z-index:2}
+.watermark .main{font-size:clamp(3rem,11vw,8.5rem);font-weight:800;line-height:.88;letter-spacing:-.05em;display:flex;flex-direction:column;align-items:center}
+.watermark .l1{color:#fff}
+.watermark .l2{background:linear-gradient(to right,#091020 0%,#0B2551 25%,#A4F4FD 62%,#14D8F7 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%;max-width:1080px;margin-top:50px;position:relative;z-index:3}
+.pcard{background:linear-gradient(135deg,rgba(0,0,0,.7),rgba(0,0,0,.4));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.9);border-radius:36px;padding:42px 26px;min-height:560px;display:flex;flex-direction:column;transition:all .6s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.pcard::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.1) 0%,rgba(255,255,255,0) 50%);pointer-events:none}
+.pcard:hover{border-color:rgba(20,216,247,.7);transform:translateY(-12px) scale(1.01);box-shadow:0 30px 80px -20px rgba(20,216,247,.3)}
+.pcard.pro{background:linear-gradient(135deg,rgba(20,216,247,.12),rgba(0,0,0,.6));border-color:rgba(20,216,247,.5)}
+.pcard.pro::after{content:'Most chosen';position:absolute;top:22px;right:22px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#000;background:var(--cyan);padding:5px 12px;border-radius:100px}
+.psmall{font-size:1.05rem;font-weight:400;color:var(--g400)}
+.plarge{font-size:2.6rem;font-weight:500;letter-spacing:-.02em;color:#fff;margin-top:8px}
+.plarge small{font-size:1rem;color:var(--g400);font-weight:400}
+.pdesc{font-size:.86rem;color:var(--g400);min-height:3em;margin:16px 0 32px;line-height:1.5}
+.plist{list-style:none;flex:1;margin-bottom:8px}
+.plist li{display:flex;align-items:flex-start;gap:13px;font-size:.9rem;color:var(--g200);margin-bottom:16px;line-height:1.4}
+.pcheck{width:26px;height:26px;border-radius:50%;background:rgba(20,216,247,.15);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.pcheck svg{width:14px;height:14px;stroke:var(--cyan)}
+.pbtn{background:#fff;color:#000;padding:11px 32px;border-radius:100px;font-weight:600;font-size:.88rem;margin-top:auto;border:none;cursor:pointer;align-self:center;transition:all .3s cubic-bezier(.22,1,.36,1);font-family:inherit}
+.pbtn:hover{transform:scale(1.03);box-shadow:0 8px 30px rgba(20,216,247,.4);background:var(--cyan)}
+.toggle-wrap{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;max-width:1080px;margin-top:34px}
+.toggle-wrap .tl{font-size:14px;color:var(--g400)}
+.toggle{width:52px;height:28px;background:rgba(255,255,255,.2);border-radius:100px;position:relative;cursor:pointer;border:none;transition:.3s;padding:0}
+.toggle.on{background:var(--cyan)}
+.knob{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:4px;left:4px;transition:.3s}
+.toggle.on .knob{transform:translateX(24px)}
+@media(max-width:1024px){
+  .price-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;width:100vw;padding:0 20px;gap:16px;scrollbar-width:none}
+  .price-grid::-webkit-scrollbar{display:none}
+  .pcard{flex:0 0 300px;scroll-snap-align:center;min-height:540px}
+}
+
+/* ---- final cta ---- */
+.final{padding:90px 0 120px;position:relative;z-index:10}
+.final-card{padding:80px 40px;text-align:center;position:relative;overflow:hidden;border-radius:28px}
+.final-glow{position:absolute;inset:0;background:radial-gradient(600px circle at 50% 0%,rgba(20,216,247,.18),transparent 70%);pointer-events:none}
+.final-card h2{font-size:clamp(34px,6vw,64px);font-weight:600;letter-spacing:-.035em;line-height:1.0;position:relative}
+.final-card p{margin:22px auto 0;color:var(--g400);max-width:460px;font-size:15px;line-height:1.6;position:relative}
+.final-card .row{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+.email-cap{max-width:480px;margin:38px auto 0;padding-top:32px;border-top:1px solid var(--line);position:relative}
+.email-cap .l{font-size:13.5px;color:var(--g400);margin-bottom:13px}
+.ef{display:flex;gap:10px}
+@media(max-width:520px){.ef{flex-direction:column}}
+.ef input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:100px;padding:12px 18px;color:#fff;font-family:inherit;font-size:14px;outline:none;transition:.3s}
+.ef input::placeholder{color:var(--g600)}
+.ef input:focus{border-color:var(--cyan)}
+
+/* ---- footer ---- */
+footer{border-top:1px solid var(--line);padding:54px 0 36px;position:relative;z-index:10}
+.foot{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:34px}
+.foot-brand{max-width:280px}
+.foot-logo{display:flex;align-items:center;gap:8px;font-size:21px;font-weight:800;letter-spacing:-.04em;margin-bottom:12px}
+.foot-logo .wv{filter:drop-shadow(0 0 8px rgba(20,216,247,.6))}
+.foot-brand p{font-size:13.5px;color:var(--g400)}
+.foot-cols{display:flex;gap:56px;flex-wrap:wrap}
+.fcol h5{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g600);margin-bottom:14px}
+.fcol a{display:block;font-size:13.5px;color:var(--g200);margin-bottom:9px;transition:.2s}
+.fcol a:hover{color:var(--cyan)}
+.foot-bot{border-top:1px solid var(--line);padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--g600)}
+
+/* ---- reveal ---- */
+.rv{opacity:0;transform:translateY(36px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+.rv.in{opacity:1;transform:none}
+
+
+/* ---- canvas aurora bg ---- */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;width:100%;height:100%}
+
+/* ---- bg-tint update: lighter so canvas shows ---- */
+.bg-tint{background:
+  radial-gradient(ellipse 110% 50% at 50% -5%,rgba(20,216,247,.04),transparent 55%),
+  radial-gradient(ellipse 80% 55% at 50% 115%,rgba(11,37,81,.15),transparent 60%)}
+
+/* ---- bg-grid: raise above canvas ---- */
+.bg-grid{z-index:3}
+
+/* ---- hero waveform ---- */
+.hero-logo-wrap{position:relative;z-index:3;margin-bottom:24px;width:min(500px,86vw);height:112px;display:flex;align-items:center;justify-content:center}
+.hero-logo-wrap canvas{display:block;width:100%;height:100%}
+.hero-logo-wrap::before{content:'';position:absolute;inset:-60% -15%;background:radial-gradient(ellipse 70% 80% at 50% 55%,rgba(20,216,247,.12),transparent 70%);pointer-events:none;z-index:-1;animation:heroGlow 4s ease-in-out infinite}
+@keyframes heroGlow{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="bg-tint"></div>
+<div class="bg-grid"></div>
+<div class="guide" style="left:calc(50% - 540px)"></div>
+<div class="guide" style="left:calc(50% + 540px)"></div>
+
+<svg width="0" height="0" style="position:absolute"><filter id="flow-noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.35 0"/><feComposite in2="SourceGraphic" operator="in" result="noise"/><feBlend in="SourceGraphic" in2="noise" mode="multiply"/></filter></svg>
+
+<div class="shell">
+
+<nav id="nav"><div class="wrap nav-in">
+  <a href="#" class="nav-logo"><span class="wv"><svg width="36" height="20" viewBox="0 0 40 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 10 C5 3 8 3 11 10 C14 17 17 17 20 10 C22 5.5 24 5 26 8" stroke="#14D8F7" stroke-width="2.6" stroke-linecap="round" fill="none"/><circle cx="31" cy="9" r="3.4" fill="#14D8F7"/></svg></span>flow</a>
+  <div class="nav-mid" id="navmid">
+    <a href="#agents" onclick="cm()">The Agents</a>
+    <a href="#wave" onclick="cm()">Wave 01</a>
+    <a href="#pulse" onclick="cm()">AI Pulse</a>
+    <a href="#pricing" onclick="cm()">Pricing</a>
+    <a href="#apply" class="pill pill-white navmid-join" onclick="cm()">Join Wave 01 <span class="ar">→</span></a>
+  </div>
+  <div class="nav-desk">
+    <a href="#apply" class="pill pill-white">Join Wave 01 <span class="ar">→</span></a>
+    <button class="hamb" onclick="tm()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</div></nav>
+
+<header class="hero">
+  <div class="hero-logo-wrap"><canvas id="hero-canvas"></canvas></div>
+  <div class="eyebrow" style="margin-bottom:22px"><span class="dot"></span>Wave 01 · Now forming · Queenstown, NZ</div>
+  <h1><span style="color:#fff">Built for Hospitality.</span><br><span class="shiny">Powered by AI.</span></h1>
+  <p class="hero-sub">The AI mentorship that teaches hospitality operators to build their own AI tools — and finally get their time back.</p>
+  <div class="hero-cta">
+    <div class="row">
+      <a href="#apply" class="pill pill-white">Join Wave 01 <span class="ar">→</span></a>
+      <a href="#problem" class="pill pill-glass">See how it works</a>
+    </div>
+    <div class="tiny">Built in a real Queenstown business · Limited to 10 operators</div>
+  </div>
+  <div class="scroll-cue">Scroll<span style="font-size:13px">↓</span></div>
+</header>
+
+<div class="macbar"><div class="macbar-in">
+  <div class="left"><span class="wv" style="display:flex"><svg width="22" height="13" viewBox="0 0 40 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 10 C5 3 8 3 11 10 C14 17 17 17 20 10 C22 5.5 24 5 26 8" stroke="#14D8F7" stroke-width="2.6" stroke-linecap="round" fill="none"/><circle cx="31" cy="9" r="3.4" fill="#14D8F7"/></svg></span><span class="nm">flow</span><a class="mi">Operators</a><a class="mi">Agents</a><a class="mi">Wave 01</a><a class="mi">Academy</a></div>
+  <div class="right"><span>From Queenstown to the world</span></div>
+</div></div>
+
+<section class="section" id="problem"><div class="wrap">
+  <div class="s-head rv"><div class="eyebrow"><span class="dot"></span>The Problem</div>
+    <h2>You didn't open a hospitality business to do admin at 11pm.</h2>
+    <p>You signed up because you love food. You love people. You love creating experiences. Not this:</p></div>
+  <div class="agents-grid">
+    <div class="agent glass rv"><div class="ico">💬</div><h3>Endless guest questions</h3><p>The same 30 questions every single day — WiFi, check-in, parking.</p><span class="badge">~2 hrs/day gone</span></div>
+    <div class="agent glass rv"><div class="ico">📋</div><h3>Manual reports</h3><p>Building the same weekly reports by hand from scattered spreadsheets.</p><span class="badge">~3 hrs/week gone</span></div>
+    <div class="agent glass rv"><div class="ico">📅</div><h3>Roster chaos</h3><p>Re-doing the schedule weekly, chasing shift swaps on WhatsApp.</p><span class="badge">~4 hrs/week gone</span></div>
+    <div class="agent glass rv"><div class="ico">💸</div><h3>Agency trap</h3><p>AI could help — but agencies want $5–20K and lock you in forever.</p><span class="badge">$5K–20K upfront</span></div>
+  </div>
+  <p style="text-align:center;font-size:clamp(20px,3vw,28px);font-weight:600;letter-spacing:-.02em;margin-top:48px;line-height:1.35" class="rv">The problem was never your passion. It's that you're trying to be <span class="shiny">eight people at once.</span></p>
+</div></section>
+
+<section class="section" id="agents"><div class="wrap">
+  <div class="s-head ctr rv"><div class="eyebrow" style="justify-content:center"><span class="dot"></span>The Agents<span class="tag">AI-native</span></div>
+    <h2>Real AI tools. Built by you.<br>Running forever.</h2>
+    <p>Not theory. Not slides. You leave Wave 01 with working AI agents live in your business. Here's what operators build:</p></div>
+  <div class="agents-grid">
+    <div class="agent glass rv"><div class="ico">🤖</div><h3>Flow Ops</h3><p>Captures every task, prioritises with AI, assigns the team, reviews daily.</p><span class="badge">Stop being the bottleneck</span></div>
+    <div class="agent glass rv"><div class="ico">✨</div><h3>Flow Agents</h3><p>Build your own chatbots & automations — the skill you keep forever.</p><span class="badge">Own your AI</span></div>
+    <div class="agent glass rv"><div class="ico">🍃</div><h3>Flow Clean</h3><p>Auto-generates cleaning SOPs and your Food Control Plan audit trail.</p><span class="badge">Compliance, invisible</span></div>
+    <div class="agent glass rv"><div class="ico">👥</div><h3>Flow People</h3><p>Job ads, interview guides, onboarding & training systems.</p><span class="badge">Stronger teams, faster</span></div>
+    <div class="agent glass rv"><div class="ico">⭐</div><h3>Flow Guest</h3><p>Reads every review across platforms, finds trends, recommends actions.</p><span class="badge">Never miss feedback</span></div>
+    <div class="agent glass rv"><div class="ico">📣</div><h3>Flow Marketing</h3><p>Content calendars and ready-to-post campaigns from your photos.</p><span class="badge">Marketing on autopilot</span></div>
+    <div class="agent glass rv"><div class="ico">📊</div><h3>Flow Insights</h3><p>Weekly profit, menu engineering, the numbers that actually matter.</p><span class="badge">Protect your margin</span></div>
+    <div class="agent glass rv"><div class="ico">🎯</div><h3>Flow Coach</h3><p>Reads your whole business and builds your 90-day growth plan.</p><span class="badge">Your AI mentor</span></div>
+  </div>
+  <p style="text-align:center;color:var(--g400);font-size:16px;margin-top:42px" class="rv">You don't need to be technical. If you can run a kitchen, you can build these.</p>
+  <div style="text-align:center;margin-top:30px" class="rv"><a href="#apply" class="pill pill-white">Join Wave 01 <span class="ar">→</span></a></div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="s-head ctr rv"><div class="eyebrow" style="justify-content:center"><span class="dot"></span>Live Demo</div>
+    <h2>This is what running on FLOW feels like.</h2>
+    <p>One AI agent, reading your operation and handling the noise — so you see only what matters.</p></div>
+  <div class="mock glass rv" style="border-radius:20px">
+    <div class="mock-bar"><div class="lights"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div><div class="lbl">flow — Operations</div></div>
+    <div class="mock-body">
+      <div class="mb-side">
+        <div class="compose">✨ Ask Flow</div>
+        <div class="nav-it on">📥 Today <span class="ct">8</span></div>
+        <div class="nav-it">⭐ Priority <span class="ct">3</span></div>
+        <div class="nav-it">📤 Delegated</div>
+        <div class="nav-it">📝 Drafts <span class="ct">2</span></div>
+        <div class="nav-it">✅ Done</div>
+        <div class="lbls"><div class="t">Agents</div>
+          <div class="lbl-it"><i style="background:#14D8F7"></i>Ops</div>
+          <div class="lbl-it"><i style="background:#A4F4FD"></i>Guest</div>
+          <div class="lbl-it"><i style="background:#f59e0b"></i>Marketing</div>
+          <div class="lbl-it"><i style="background:#10b981"></i>Insights</div>
+        </div>
+      </div>
+      <div class="mb-list">
+        <div class="list-srch">🔍 Search your operation</div>
+        <div class="msg unread on"><div class="top"><span class="nm">Flow Insights</span><span class="tm">8:00 AM</span></div><div class="sub">Weekly profit summary ready</div><div class="pv">Revenue up 12% vs last week. Margin holding at 31%...</div></div>
+        <div class="msg unread"><div class="top"><span class="nm">Flow Guest</span><span class="tm">7:42 AM</span></div><div class="sub">3 reviews need a reply</div><div class="pv">2 five-star, 1 mentions slow service at brunch...</div></div>
+        <div class="msg"><div class="top"><span class="nm">Flow People</span><span class="tm">Yesterday</span></div><div class="sub">New chef application screened</div><div class="pv">Strong fit — 4 yrs experience, available weekends...</div></div>
+        <div class="msg"><div class="top"><span class="nm">Flow Clean</span><span class="tm">Yesterday</span></div><div class="sub">FCP audit trail updated</div><div class="pv">All temperature logs complete. Ready for inspection...</div></div>
+        <div class="msg"><div class="top"><span class="nm">Flow Marketing</span><span class="tm">Mon</span></div><div class="sub">This week's content is ready</div><div class="pv">5 posts drafted from your weekend photos...</div></div>
+        <div class="msg"><div class="top"><span class="nm">Flow Ops</span><span class="tm">Mon</span></div><div class="sub">Roster built for next week</div><div class="pv">Optimised for Sat dinner peak. Team notified...</div></div>
+      </div>
+      <div class="mb-read">
+        <div class="read-tools"><div class="tb">↩</div><div class="tb">➡</div><div class="tb">🗄</div><div class="tb">🗑</div><div class="sp"></div><div class="tb">⋯</div></div>
+        <div class="read-hd"><div class="ti">Weekly profit summary ready</div>
+          <div class="from"><div class="ava">F</div><div class="meta"><div class="a">Flow Insights</div><div class="b">to you · 8:00 AM</div></div><span class="pillwork">Insights</span></div></div>
+        <div class="read-body">
+          <div class="sumcard"><span style="font-size:18px">✨</span><div><div class="ttl">Summary by Flow</div><div class="tx">Revenue up 12% this week. Your margin is holding at 31%. Birria tacos are your top earner; the burger is running at a loss. One action: re-price the burger.</div></div></div>
+          <p>Morning,</p>
+          <p>Here's last week across the floor. Strong week — covers up, average spend up, and labour cost stayed inside target at 28%.</p>
+          <p>The one thing to look at: your classic burger is selling well but the margin slipped to 41% food cost after the supplier price rise. I've drafted three fixes.</p>
+          <p style="color:var(--g600)">— Flow Insights, running quietly in the background.</p>
+          <div class="attach">📎 weekly-summary.pdf</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap split">
+  <div class="rv"><div class="eyebrow"><span class="dot"></span>The FLOW Way<span class="tag">Build · Own · Flow</span></div>
+    <h2 style="margin-top:20px;font-size:clamp(28px,4.5vw,46px);font-weight:600;letter-spacing:-.035em;line-height:1.02">Most AI companies build tools.<br><span class="shiny">FLOW builds operators.</span></h2>
+    <p style="margin-top:24px;color:var(--g400);font-size:16px;line-height:1.6;max-width:440px">The future of hospitality isn't Human or AI. It's Human plus AI. The best businesses of the next decade won't have the most staff — they'll have the best systems.</p>
+    <div class="chips"><span class="chip">No code</span><span class="chip">No agency</span><span class="chip">No dependency</span><span class="chip">Yours forever</span></div>
+  </div>
+  <div class="triage-card glass rv">
+    <div class="hd">"The best AI for your business is the one you built yourself."</div>
+    <div class="tsub glass"><div class="tsub-hd"><i style="background:#14D8F7"></i><span class="n">Build</span></div><div class="it">You construct the tool yourself — hands-on, no code</div></div>
+    <div class="tsub glass"><div class="tsub-hd"><i style="background:#A4F4FD"></i><span class="n">Own</span></div><div class="it">It belongs to you. No subscriptions, no dependency</div></div>
+    <div class="tsub glass"><div class="tsub-hd"><i style="background:#10b981"></i><span class="n">Flow</span></div><div class="it">Your operation runs smoothly — with or without you</div></div>
+  </div>
+</div></section>
+
+<section class="section" id="wave"><div class="wrap">
+  <div class="s-head ctr rv"><div class="eyebrow" style="justify-content:center"><span class="dot"></span>How Wave 01 Works</div>
+    <h2>Six weeks. One real tool.<br>Built by you.</h2></div>
+  <div class="flowline glass rv" style="border-radius:18px;padding:8px">
+    <div class="fstep"><div class="n">01</div><h3>Diagnose</h3><p>Find your single biggest time drain</p></div>
+    <div class="fstep"><div class="n">02</div><h3>Design</h3><p>Map the AI solution — no code, just logic</p></div>
+    <div class="fstep"><div class="n">03</div><h3>Build</h3><p>Hands-on sessions in Queenstown</p></div>
+    <div class="fstep"><div class="n">04</div><h3>Test</h3><p>Run it live in your real operation</p></div>
+    <div class="fstep hot"><div class="n">05</div><h3>Deploy</h3><p>Your tool goes live — Monday morning</p></div>
+    <div class="fstep"><div class="n">06</div><h3>Scale</h3><p>Walk away able to build the next one</p></div>
+  </div>
+  <div class="flowtrack rv"><div class="fill"></div></div>
+  <div class="guarantee glass rv">Every operator leaves Wave 01 with one AI tool running live in their business. <b>Guaranteed.</b></div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="s-head ctr rv"><div class="eyebrow" style="justify-content:center"><span class="dot"></span>Who It's For</div>
+    <h2>Built for operators.<br>Not for tech people.</h2></div>
+  <div class="pgrid">
+    <div class="persona glass rv"><div class="em">🏨</div><h3>The Hotel Owner</h3><div class="role">Boutique hotels · Lodges · B&Bs</div>
+      <div class="bf seg"><div class="lb">Before</div><p>Can't take a day off. Drowning in guest messages.</p></div>
+      <div class="af seg"><div class="lb">After FLOW</div><p>AI handles the comms. First weekend off in years.</p></div></div>
+    <div class="persona glass rv"><div class="em">🍽️</div><h3>The Restauranteur</h3><div class="role">Restaurants · Cafés · 1–3 sites</div>
+      <div class="bf seg"><div class="lb">Before</div><p>4 hrs/week on scheduling. Menu decisions by gut.</p></div>
+      <div class="af seg"><div class="lb">After FLOW</div><p>Auto-scheduling. Weekly AI menu analysis.</p></div></div>
+    <div class="persona glass rv"><div class="em">🏔️</div><h3>The Experience Maker</h3><div class="role">Tour operators · Fiordland</div>
+      <div class="bf seg"><div class="lb">Before</div><p>At capacity. Follow-ups inconsistent. Can't scale.</p></div>
+      <div class="af seg"><div class="lb">After FLOW</div><p>30% more bookings handled. Zero extra hires.</p></div></div>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap split">
+  <div class="rv"><div class="eyebrow"><span class="dot"></span>Why FLOW</div>
+    <h2 style="margin-top:20px;font-size:clamp(26px,4vw,42px);font-weight:600;letter-spacing:-.035em;line-height:1.05">We're not engineers who discovered hospitality. We're operators who learned AI.</h2>
+    <p style="margin-top:22px;color:var(--g400);font-size:16px;line-height:1.6">FLOW was born in a real Queenstown hospitality business. The agents were tested in a working kitchen, not a lab. The advantage was never the AI — it's understanding hospitality.</p>
+    <div class="chips" style="flex-direction:column;align-items:flex-start;gap:14px;margin-top:26px">
+      <span style="display:flex;gap:11px;align-items:center;font-size:14px;color:var(--g200)"><span style="font-size:19px">🌊</span>Born in Queenstown — a world-class hospitality lab</span>
+      <span style="display:flex;gap:11px;align-items:center;font-size:14px;color:var(--g200)"><span style="font-size:19px">🔬</span>Tested in a real business — not a startup demo</span>
+      <span style="display:flex;gap:11px;align-items:center;font-size:14px;color:var(--g200)"><span style="font-size:19px">🤝</span>Built to make you independent — not dependent</span>
+    </div>
+  </div>
+  <div class="glass rv" style="aspect-ratio:4/5;border-radius:22px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 35% 25%,rgba(20,216,247,.2),transparent 50%),radial-gradient(circle at 70% 80%,rgba(11,37,81,.4),transparent 55%)"></div>
+    <div style="text-align:center;position:relative;padding:30px">
+      <div class="shiny" style="font-size:62px;font-weight:800;letter-spacing:-.04em">45°S</div>
+      <div style="font-size:14px;color:var(--g400);margin-top:10px">Queenstown · South Island<br>New Zealand</div>
+    </div>
+  </div>
+</div></section>
+
+<section class="pricing section" id="pricing">
+  <div class="watermark rv"><div class="main"><span class="l1">Built for Hospitality.</span><span class="l2">Powered by AI.</span></div></div>
+  <div class="price-grid">
+    <div class="pcard rv">
+      <div class="psmall">AI Pulse + Community</div>
+      <div class="plarge">Free</div>
+      <div class="pdesc">For operators taking their first step into hospitality AI.</div>
+      <ul class="plist">
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Weekly podcast: real case studies</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Prompt & template library</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Community of operators</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Global access, any device</li>
+      </ul>
+      <button class="pbtn">Subscribe free</button>
+    </div>
+    <div class="pcard pro rv">
+      <div class="psmall">flow academy · Wave 01</div>
+      <div class="plarge"><span data-m="From $1,200" data-y="From $1,200">From $1,200</span></div>
+      <div class="pdesc">The 6-week build program. Our core offer — and the first wave.</div>
+      <ul class="plist">
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>6-week hands-on program</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Build 1 real AI tool, live</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Max 10 operators per wave</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>In-person (Queenstown) or online</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Lifetime alumni community</li>
+      </ul>
+      <button class="pbtn">Join Wave 01 →</button>
+    </div>
+    <div class="pcard rv">
+      <div class="psmall">1:1 Mentorship</div>
+      <div class="plarge"><span data-m="From $400" data-y="From $400">From $400</span><small>/session</small></div>
+      <div class="pdesc">Private, fully personalised to your specific operation.</div>
+      <ul class="plist">
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Fully personalised</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Build multiple tools</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>Ongoing support</li>
+        <li><span class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span>By application only</li>
+      </ul>
+      <button class="pbtn">Request a call</button>
+    </div>
+  </div>
+  <div class="toggle-wrap rv"><span class="tl">Everything you build is yours to keep — forever.</span></div>
+</section>
+
+<section class="section" id="pulse"><div class="wrap">
+  <div class="s-head ctr rv"><div class="eyebrow" style="justify-content:center"><span class="dot"></span>The Bigger Picture</div>
+    <h2>This is bigger than software.</h2>
+    <p>By 2035, nobody will talk about "AI" — the same way nobody talks about electricity-powered accounting today. It just becomes how great hospitality runs. FLOW is building that future, starting in Queenstown.</p></div>
+  <div style="text-align:center" class="rv">
+    <p style="font-size:clamp(20px,3.4vw,32px);font-weight:700;letter-spacing:-.02em;line-height:1.5;color:var(--g400)">Better systems create better businesses.</p>
+    <p style="font-size:clamp(20px,3.4vw,32px);font-weight:700;letter-spacing:-.02em;line-height:1.5;color:var(--g200)">Better businesses create better jobs.</p>
+    <p style="font-size:clamp(20px,3.4vw,32px);font-weight:700;letter-spacing:-.02em;line-height:1.5" class="shiny">Better jobs create better communities.</p>
+    <p style="margin-top:26px;font-size:16px;color:var(--g200)">AI is just the vehicle. The mission is much bigger. <b style="color:#fff">From Queenstown to the world.</b></p>
+  </div>
+</div></section>
+
+<section class="final" id="apply"><div class="wrap">
+  <div class="final-card glass rv">
+    <div class="final-glow"></div>
+    <h2>Ready to <span class="shiny">flow?</span></h2>
+    <p>Wave 01 is forming now. Limited to 10 operators. When it's full, it's full.</p>
+    <div class="row">
+      <a href="#" class="pill pill-white">Join Wave 01 <span class="ar">→</span></a>
+      <a href="#pulse" class="pill pill-glass">Listen to AI Pulse first</a>
+    </div>
+    <div class="email-cap">
+      <div class="l">Not ready to apply? Get the free hospitality-AI playbook + join the waitlist.</div>
+      <form class="ef" onsubmit="return false"><input type="email" placeholder="you@yourbusiness.com" aria-label="Email"><button class="pill pill-white" type="submit">Join the list</button></form>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="foot">
+    <div class="foot-brand"><div class="foot-logo"><span class="wv"><svg width="36" height="20" viewBox="0 0 40 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 10 C5 3 8 3 11 10 C14 17 17 17 20 10 C22 5.5 24 5 26 8" stroke="#14D8F7" stroke-width="2.6" stroke-linecap="round" fill="none"/><circle cx="31" cy="9" r="3.4" fill="#14D8F7"/></svg></span>flow</div><p>Built for Hospitality. Powered by AI.</p></div>
+    <div class="foot-cols">
+      <div class="fcol"><h5>Product</h5><a href="#agents">The Agents</a><a href="#wave">Wave 01</a><a href="#pulse">AI Pulse</a><a href="#apply">Apply</a></div>
+      <div class="fcol"><h5>Connect</h5><a href="https://flow.ai">flow.ai</a><a href="mailto:hello@flow.ai">hello@flow.ai</a><a href="#">@Flow.Ai</a><a href="#">Queenstown, NZ</a></div>
+    </div>
+  </div>
+  <div class="foot-bot"><span>© 2025 FLOW. From Queenstown to the world.</span><span>flow.ai</span></div>
+</div></footer>
+
+</div>
+
+<script>
+var nav=document.getElementById('nav');
+addEventListener('scroll',function(){nav.classList.toggle('scrolled',scrollY>30)});
+function tm(){document.getElementById('navmid').classList.toggle('open')}
+function cm(){document.getElementById('navmid').classList.remove('open')}
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+</script>
+
+<script>
+/* === Aurora Background Canvas === */
+(function(){
+  var c = document.getElementById('bg-canvas');
+  if(!c) return;
+  var ctx = c.getContext('2d');
+  var W, H, dpr, vw, vh;
+
+  var blobs = [
+    {bx:.50,by:.00,rx:.85,ry:.55,r:20,g:216,b:247,a:.10,tx:0.0,ty:0.0,s:.00014},
+    {bx:.18,by:.68,rx:.58,ry:.48,r:11,g:37, b:81, a:.60,tx:1.5,ty:2.0,s:.00010},
+    {bx:.80,by:.35,rx:.50,ry:.40,r:20,g:216,b:247,a:.06,tx:2.5,ty:1.0,s:.00018},
+    {bx:.06,by:.25,rx:.42,ry:.55,r:0, g:180,b:220,a:.07,tx:1.0,ty:3.0,s:.00016},
+    {bx:.65,by:.90,rx:.68,ry:.44,r:11,g:37, b:81, a:.55,tx:3.0,ty:0.5,s:.00009},
+    {bx:.42,by:.50,rx:.32,ry:.28,r:20,g:216,b:247,a:.05,tx:4.0,ty:2.5,s:.00020},
+  ];
+
+  function resize(){
+    dpr = window.devicePixelRatio||1;
+    vw  = window.innerWidth;
+    vh  = window.innerHeight;
+    c.width  = vw * dpr;
+    c.height = vh * dpr;
+    c.style.width  = vw + 'px';
+    c.style.height = vh + 'px';
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr,dpr);
+  }
+
+  var t = 0;
+  function frame(){
+    ctx.clearRect(0,0,vw,vh);
+    ctx.fillStyle='#0A0A0C';
+    ctx.fillRect(0,0,vw,vh);
+
+    for(var i=0;i<blobs.length;i++){
+      var b  = blobs[i];
+      var bx = (b.bx + Math.sin(t*b.s*1000+b.tx)*0.13)*vw;
+      var by = (b.by + Math.cos(t*b.s*900 +b.ty)*0.10)*vh;
+      var rr = Math.min(vw,vh)*b.rx;
+      var gr = ctx.createRadialGradient(bx,by,0,bx,by,rr);
+      gr.addColorStop(0  ,'rgba('+b.r+','+b.g+','+b.b+','+b.a+')');
+      gr.addColorStop(.45,'rgba('+b.r+','+b.g+','+b.b+','+(b.a*.25)+')');
+      gr.addColorStop(1  ,'rgba('+b.r+','+b.g+','+b.b+',0)');
+      ctx.fillStyle = gr;
+      ctx.save();
+      ctx.translate(bx,by);
+      ctx.scale(1, b.ry/b.rx);
+      ctx.beginPath();
+      ctx.arc(0,0,rr,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    t+=16;
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  frame();
+})();
+
+/* === Hero Waveform Canvas === */
+(function(){
+  var c = document.getElementById('hero-canvas');
+  if(!c) return;
+  var ctx = c.getContext('2d');
+  var dpr = window.devicePixelRatio||1;
+  var CW  = 500, CH = 112;
+  c.width  = CW*dpr;
+  c.height = CH*dpr;
+  ctx.scale(dpr,dpr);
+
+  var layers = [
+    {amp:22, f:.0200, sp:1.00, lw:2.8, a:1.00},
+    {amp:13, f:.0340, sp:1.55, lw:1.6, a:0.50},
+    {amp: 7, f:.0520, sp:2.10, lw:1.0, a:0.22},
+  ];
+
+  var t = 0;
+  function frame(){
+    ctx.clearRect(0,0,CW,CH);
+    var cy = CH/2;
+
+    for(var s=0;s<layers.length;s++){
+      var ly = layers[s];
+      ctx.beginPath();
+      for(var x=0;x<=CW;x++){
+        var y = cy
+          + Math.sin(x*ly.f + t*ly.sp        )*ly.amp
+          + Math.sin(x*ly.f*1.72 + t*ly.sp*.68+1.2)*ly.amp*.32;
+        x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      var grad = ctx.createLinearGradient(0,0,CW,0);
+      grad.addColorStop(0,   'rgba(20,216,247,0)');
+      grad.addColorStop(.12, 'rgba(20,216,247,'+ly.a+')');
+      grad.addColorStop(.50, 'rgba(164,244,253,'+ly.a+')');
+      grad.addColorStop(.88, 'rgba(20,216,247,'+ly.a+')');
+      grad.addColorStop(1,   'rgba(20,216,247,0)');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = ly.lw;
+      ctx.shadowColor = '#14D8F7';
+      ctx.shadowBlur  = s===0 ? 14 : 5;
+      ctx.stroke();
+    }
+
+    /* glowing dot */
+    var pulse = 1 + Math.sin(t*3)*0.25;
+    var dotX  = CW*.68 + Math.sin(t*.7)*CW*.03;
+    var dotY  = cy
+      + Math.sin(dotX*layers[0].f + t*layers[0].sp)*layers[0].amp
+      + Math.sin(dotX*layers[0].f*1.72 + t*layers[0].sp*.68+1.2)*layers[0].amp*.32;
+    ctx.shadowBlur = 22*pulse;
+    ctx.shadowColor= '#14D8F7';
+    ctx.fillStyle  = '#14D8F7';
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, 5.5*pulse, 0, Math.PI*2);
+    ctx.fill();
+
+    /* secondary dot accent */
+    var d2x = CW*.30 + Math.sin(t*.5+2)*CW*.025;
+    var d2y = cy
+      + Math.sin(d2x*layers[0].f + t*layers[0].sp)*layers[0].amp
+      + Math.sin(d2x*layers[0].f*1.72 + t*layers[0].sp*.68+1.2)*layers[0].amp*.32;
+    ctx.shadowBlur = 12;
+    ctx.fillStyle  = 'rgba(164,244,253,0.7)';
+    ctx.beginPath();
+    ctx.arc(d2x, d2y, 3, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    t += .040;
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
